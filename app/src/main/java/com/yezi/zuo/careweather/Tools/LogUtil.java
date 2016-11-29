@@ -4,6 +4,7 @@ import android.util.Log;
 
 /**
  * Created by zuo on 2016/11/27.
+ * 方便以后工程完成后抹去log
  */
 
 public class LogUtil {
