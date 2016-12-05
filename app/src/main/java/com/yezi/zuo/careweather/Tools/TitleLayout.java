@@ -30,11 +30,13 @@ public class TitleLayout extends LinearLayout {
         public void handleMessage(Message message){
             switch (message.what){
                 case 1:
+
+
                     if(MainActivity.flag==1){
 
                         MainActivity.flag=0;
                         MainActivity.relativeLayout.setBackgroundDrawable(getResources().getDrawable(R.drawable.night));
-
+                        MainActivity.textPlace.setText("西安");
                     }
                     else{
                         MainActivity.relativeLayout.setBackgroundDrawable(getResources().getDrawable(R.drawable.day));
@@ -53,7 +55,7 @@ public class TitleLayout extends LinearLayout {
         super(context, attrs);
         LayoutInflater.from(context).inflate(R.layout.title,this);
         Button titlepublish = (Button)findViewById(R.id.title_publish);
-        Button titlemodel = (Button)findViewById(R.id.title_model);
+        final Button titlemodel = (Button)findViewById(R.id.title_model);
         titlepublish.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,7 +65,6 @@ public class TitleLayout extends LinearLayout {
         titlemodel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
