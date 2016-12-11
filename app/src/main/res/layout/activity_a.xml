@@ -16,6 +16,12 @@
         android:layout_height="match_parent"
        >
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/picday"
+           />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -33,17 +39,26 @@
             android:layout_height="wrap_content"
             android:id="@+id/weather_info_layout"
             android:orientation="vertical"
-            android:layout_marginTop="109dp"
+            android:layout_marginTop="15dp"
             android:layout_below="@+id/publish_text"
             android:layout_centerHorizontal="true"
             android:weightSum="1">
 
             <TextView
                 android:layout_width="wrap_content"
+                android:layout_height="50dp"    android:layout_gravity="center_horizontal"
+                android:id="@+id/weather_todaytime"
+                android:text="time"
+                android:gravity="center"
+                android:textColor="@color/lightslategray"
+                android:textSize="25dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="60dp"
                 android:layout_gravity="center_horizontal"
                 android:id="@+id/weather"
-                android:text="晴天"
+                android:text="待更新"
                 android:gravity="center"
                 android:textColor="#FFF"
                 android:textSize="40dp"/>
@@ -64,25 +79,39 @@
                     android:textSize="40sp"/>
 
 
-
             </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pm"
+                android:layout_gravity="center"
+                android:textColor="@color/white"
+                android:textSize="35sp"/>
 
 
 
-            <!--<ScrollView-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--&gt;-->
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:maxLines="1"-->
-                    <!--android:textSize="30dp"-->
-                    <!--android:text="星期一 星期二 星期三 星期四 星期五 周末"/>-->
 
 
-            <!--</ScrollView>-->
+            <GridView
+                android:layout_marginTop="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:numColumns="4"
+                android:verticalSpacing="10dp"
+                android:horizontalSpacing="10dp"
+                android:id="@+id/weather_day"
+                ></GridView>
 
+
+            <GridView
+                android:layout_marginTop="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:numColumns="3"
+                android:verticalSpacing="10dp"
+                android:horizontalSpacing="10dp"
+                android:id="@+id/weather_do"
+                ></GridView>
 
 
 
@@ -94,7 +123,7 @@
             android:layout_height="40dp"
             android:id="@+id/current_date"
             android:gravity="center"
-            android:text="时间"
+            android:text=""
             android:textColor="#FFF"
             android:textSize="18sp"
             android:layout_marginTop="69dp"

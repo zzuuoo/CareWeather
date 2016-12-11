@@ -1,7 +1,10 @@
 package com.yezi.zuo.careweather.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,9 +19,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -60,7 +67,7 @@ import java.util.concurrent.RunnableFuture;
  * Created by zuo on 2016/11/27.
  */
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 
     /**
@@ -68,51 +75,60 @@ public class MainActivity extends BaseActivity {
      * 2 黑夜模式
      */
 
-//    String aaa="{\"error\":0,\"status\":\"success\",\"date\":\"2016-12-05\",\"results\":[{\"currentCity\":\"西安\",\"pm25\":\"94\",\"index\":[{\"title\":\"穿衣\",\"zs\":\"较冷\",\"tipt\":\"穿衣指数\",\"des\":\"建议着厚外套加毛衣等服装。年老体弱者宜着大衣、呢外套加羊毛衫。\"},{\"title\":\"洗车\",\"zs\":\"较适宜\",\"tipt\":\"洗车指数\",\"des\":\"较适宜洗车，未来一天无雨，风力较小，擦洗一新的汽车至少能保持一天。\"},{\"title\":\"旅游\",\"zs\":\"适宜\",\"tipt\":\"旅游指数\",\"des\":\"天气较好，温度适宜，是个好天气哦。这样的天气适宜旅游，您可以尽情地享受大自然的风光。\"},{\"title\":\"感冒\",\"zs\":\"易发\",\"tipt\":\"感冒指数\",\"des\":\"昼夜温差很大，易发生感冒，请注意适当增减衣服，加强自我防护避免感冒。\"},{\"title\":\"运动\",\"zs\":\"较不宜\",\"tipt\":\"运动指数\",\"des\":\"天气较好，但考虑天气寒冷，推荐您进行各种室内运动，若在户外运动请注意保暖并做好准备活动。\"},{\"title\":\"紫外线强度\",\"zs\":\"中等\",\"tipt\":\"紫外线强度指数\",\"des\":\"属中等强度紫外线辐射天气，外出时建议涂擦SPF高于15、PA+的防晒护肤品，戴帽子、太阳镜。\"}],\"weather_data\":[{\"date\":\"周一 12月05日 (实时：13℃)\",\"dayPictureUrl\":\"http://api.map.baidu.com/images/weather/day/qing.png\",\"nightPictureUrl\":\"http://api.map.baidu.com/images/weather/night/qing.png\",\"weather\":\"晴\",\"wind\":\"东北风微风\",\"temperature\":\"13 ~ 0℃\"},{\"date\":\"周二\",\"dayPictureUrl\":\"http://api.map.baidu.com/images/weather/day/qing.png\",\"nightPictureUrl\":\"http://api.map.baidu.com/images/weather/night/qing.png\",\"weather\":\"晴\",\"wind\":\"东北风微风\",\"temperature\":\"12 ~ -1℃\"},{\"date\":\"周三\",\"dayPictureUrl\":\"http://api.map.baidu.com/images/weather/day/duoyun.png\",\"nightPictureUrl\":\"http://api.map.baidu.com/images/weather/night/qing.png\",\"weather\":\"多云转晴\",\"wind\":\"东北风微风\",\"temperature\":\"9 ~ 1℃\"},{\"date\":\"周四\",\"dayPictureUrl\":\"http://api.map.baidu.com/images/weather/day/duoyun.png\",\"nightPictureUrl\":\"http://api.map.baidu.com/images/weather/night/duoyun.png\",\"weather\":\"多云\",\"wind\":\"东北风微风\",\"temperature\":\"12 ~ 2℃\"}]}]}";
     public static Weather weather=null;
+    public static place Place=null;
     public static int flag = 1;
-
-    public static int model = 1;
-    /**
-     * model 1 晴天
-     * 2 雨天
-     * 3 雪天
-     * 4 雷天
-     */
+    public static Context context;
 
     public static String u = "http://api.map.baidu.com/telematics/v3/weather?location=";
     public static String r = "&output=json&ak=Gi27P5bmIinr86htrjU4ESnY";
-    public static String uri = u +"西安" +r;
+    public static String p="西安";
+    public static String uri = u +p+r;
+
+    public static ImageView pic;
 
 
-    public static TextView textPlace, textTime, textTemp, textWeather, textpublish;
+    public static TextView textPlace, textTime, textTemp,
+            textWeather, textpublish,pm25,weather_todaytime;
 
 
     public static LinearLayout relativeLayout;
+    public static GridView xinqi,weather_do_g;
 
 
     private Handler handler = new Handler();
     private Runnable runnable = new Runnable() {
         public void run() {
             this.update();
-            handler.postDelayed(this, 1000 * 120);// 间隔120秒
+            handler.postDelayed(this, 1000*60*60*12);
         }
 
         void update() {
             setTime();
+
             //刷新msg的内容
         }
     };
-    private Handler weatherhandel = new Handler(){
+
+
+
+
+    private  Handler weatherhandel = new Handler(){
         public void handleMessage(Message message){
             switch (message.what){
                 case 1:
                     String response = (String )message.obj;
-                    parseJSONWithJSONObject(response);
+                    parseJSONWithJSONObject(response,zifu.city);
+                    initData();
+                    break;
+                case 2:
+//                    Toast.makeText(getApplicationContext(),message.obj.toString(),Toast.LENGTH_SHORT).show();
+                    pic.setImageBitmap((Bitmap)message.obj);
+                    break;
             }
         }
     };
-    private void sendQequestWinthHttpURLConnection(){
+    private  void sendQequestWinthHttpURLConnection(){
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -148,9 +164,27 @@ public class MainActivity extends BaseActivity {
 
 
 
-    private void parseJSONWithJSONObject(String jsonData){
+    private  void parseJSONWithJSONObject(String jsonData,String placeData){
         Gson gson =new Gson();
         weather = gson.fromJson(jsonData,Weather.class);
+        Place = gson.fromJson(placeData,place.class);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+               if(weather!=null){
+                   Bitmap bitmapday = getImageBitmap(weather.getResults().get(0).
+                           getWeather_data().get(0).getDayPictureUrl());
+//                   Bitmap bitmapnight = getImageBitmap(weather.getResults().get(0).
+//                           getWeather_data().get(0).getNightPictureUrl());
+                   Message message = new Message();
+                   message.what=1;
+                   message.obj=bitmapday;
+                   message.what=2;
+                   weatherhandel.sendMessage(message);
+               }
+            }
+        }).start();
+
     }
 
     @Override
@@ -158,11 +192,43 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_a);
+        context=getApplicationContext();
         init();
-        setTime();
-        handler.postDelayed(runnable, 1000 * 60);
         sendQequestWinthHttpURLConnection();
-        initData();
+        handler.postDelayed(runnable, 1000);
+        setTime();
+
+        xinqi.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Weather_data weather_data = weather.getResults().get(0).getWeather_data().get(position);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                dialog.setTitle(weather_data.getDate());
+                dialog.setMessage("天气："+weather_data.getWeather()+"    温度："+
+                        weather_data.getTemperature()+"    风："
+                        +weather_data.getWind());
+                dialog.setCancelable(true);
+                dialog.show();
+//                Toast.makeText(getApplicationContext(),weather_data.getWeather()+weather_data.getTemperature()
+//                        +weather_data.getWind(),Toast.LENGTH_SHORT).show();
+            }
+        });
+        weather_do_g.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                dialog.setTitle(weather.getResults().get(0).getIndex().get(position).getTitle());
+                dialog.setMessage(weather.getResults().get(0).
+                        getIndex().get(position).getDes());
+                dialog.setCancelable(true);
+                dialog.show();
+//                Toast.makeText(getApplicationContext(),weather.getResults().get(0).
+//                        getIndex().get(position).getDes(),Toast.LENGTH_SHORT).show();
+
+            }
+        });
+//        initData();
     }
 
 
@@ -172,38 +238,116 @@ public class MainActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    private static void initData(){
-        if(weather!=null){
-            textPlace.setText(weather.getResults().get(0).getCurrentCity());
+    public  void initData(){
+
+        if(weather!=null&&weather.getStatus().endsWith("success")){
+            textPlace.setText(weather.getResults().get(0).getCurrentCity()+" ✔");
             textTemp.setText(
-                    weather.getResults().get(0).getWeather_data().get(0).getTemperature());
+                    weather.getResults().get(0).getWeather_data().get(0).getTemperature()+
+            "  风:"+weather.getResults().get(0).getWeather_data().get(0).getWind());
+            pm25.setText(" pm2.5值为:"+ weather.getResults().get(0).getPm25());
             textTime.setText(weather.getDate());
             textWeather.setText(weather.getResults().get(0).getWeather_data().get(0).getWeather());
 
+            weather_todaytime.setText(weather.getResults().get(0).getWeather_data().get(0).getDate());
+            Weather_data_adapter weather_data_adapter =new Weather_data_adapter(MainActivity.this,
+                    R.layout.weatherdataitem,weather.getResults().get(0).getWeather_data());
+            xinqi = (GridView)findViewById(R.id.weather_day);
+            xinqi.setAdapter(weather_data_adapter);
+
+
+            weather_do_adapter weather_do  =new weather_do_adapter(MainActivity.this,
+                    R.layout.weather_doitem,weather.getResults().get(0).getIndex());
+            weather_do_g.setAdapter(weather_do);
+
+//            weather_icon.setImageBitmap(
+//                    getImageBitmap(weather.getResults().get(0).getWeather_data()
+//                            .get(0).getNightPictureUrl()));
+
+
+        }else{
+            Toast.makeText(context,"抱歉，没找到该城市数据",Toast.LENGTH_SHORT).show();
         }
           }
 
     public void init() {
+        pic=(ImageView)findViewById(R.id.picday);
+        pm25=(TextView)findViewById(R.id.pm);
         textPlace = (TextView) findViewById(R.id.title_text);
         textTime = (TextView) findViewById(R.id.current_date);
         textTemp = (TextView) findViewById(R.id.temp);
         textWeather = (TextView) findViewById(R.id.weather);
         textpublish = (TextView) findViewById(R.id.publish_text);
         relativeLayout = (LinearLayout) findViewById(R.id.activity_a);
+        xinqi = (GridView)findViewById(R.id.weather_day);
+        textPlace.setOnClickListener(this);
+        weather_do_g=(GridView)findViewById(R.id.weather_do);
+        weather_todaytime=(TextView)findViewById(R.id.weather_todaytime);
 
 
     }
 
+    public static Bitmap getImageBitmap(String url){
+        URL imgUrl = null;
+        Bitmap bitmap = null;
+        try {
+            imgUrl = new URL(url);
+            HttpURLConnection conn = (HttpURLConnection)imgUrl.openConnection();
+            conn.setDoInput(true);
+            conn.connect();
+            InputStream is = conn.getInputStream();
+            bitmap = BitmapFactory.decodeStream(is);
+            is.close();
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        return bitmap;
+    }
 
-    public static void setTime() {
+    public  void setTime() {
+        setnowTime();
+        weatherhandel.sendMessage(new Message());
+        sendQequestWinthHttpURLConnection();
+        initData();
+    }
+    public  static void setnowTime() {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");//设置日期格式
         // new Date()为获取当前系统时间
         textTime.setText(df.format(new Date()));
         SimpleDateFormat df2 = new SimpleDateFormat("HH:mm:ss");//设置日期格式
-        textpublish.setText("今天" + df2.format(new Date()) + "发布");
-
-        initData();
-
+        textpublish.setText(df2.format(new Date()));
+//        if(Place!=null){
+//            zifu.cityArrayList.clear();
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getA());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getB());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getC());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getD());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getE());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getF());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getG());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getH());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getI());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getJ());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getK());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getL());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getM());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getN());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getO());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getP());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getQ());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getR());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getS());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getT());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getU());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getV());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getW());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getX());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getY());
+//            zifu.cityArrayList.addAll(Place.getCity().get(0).getZ());
+//        }
     }
 
 
@@ -219,8 +363,16 @@ public class MainActivity extends BaseActivity {
 
         switch (item.getItemId()) {
             case R.id.shezhi:
-                if(weather!=null)
-                Toast.makeText(getApplicationContext(), weather.getDate()+weather.getResults().get(0).getCurrentCity(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"你想干嘛？",Toast.LENGTH_SHORT).show();
+//                if(Place!=null)
+//                    Toast.makeText(getApplicationContext(), Place.getCity().get(0).热门.get(0).getName(), Toast.LENGTH_SHORT).show();
+//                if(weather!=null&&weather.getStatus().equals("success")){
+//                    Weather_data_adapter weather_data_adapter =new Weather_data_adapter(MainActivity.this,
+//                            R.layout.weatherdataitem,weather.getResults().get(0).getWeather_data());
+//                    GridView gridView = (GridView)findViewById(R.id.weather_day);
+//                    gridView.setAdapter(weather_data_adapter);
+//                }
+//                Toast.makeText(getApplicationContext(), weather.getDate()+weather.getResults().get(0).getCurrentCity(), Toast.LENGTH_SHORT).show();
 //
 //                textPlace.setText(weather.getResults().get(0).getCurrentCity());
 //                textTemp.setText(weather.getResults().get(0).getWeather_data().get(0).getTemperature());
@@ -235,4 +387,31 @@ public class MainActivity extends BaseActivity {
         return true;
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.title_text:
+
+                Intent intent = new Intent(MainActivity.this,choice_city.class);
+                startActivityForResult(intent,1);
+                break;
+        }
+    }
+    @Override
+    protected void onActivityResult(int requestCode,int resultCode,Intent data){
+        switch (resultCode){
+            case 1:
+                p=data.getStringExtra("pl");
+                if(!p.equals("")){
+                    uri=u+p+r;
+                    sendQequestWinthHttpURLConnection();
+                    setTime();
+                }else{
+
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }

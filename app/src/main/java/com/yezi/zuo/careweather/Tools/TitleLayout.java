@@ -36,13 +36,15 @@ public class TitleLayout extends LinearLayout {
 
                         MainActivity.flag=0;
                         MainActivity.relativeLayout.setBackgroundDrawable(getResources().getDrawable(R.drawable.night));
-                        MainActivity.textPlace.setText("西安");
                     }
                     else{
                         MainActivity.relativeLayout.setBackgroundDrawable(getResources().getDrawable(R.drawable.day));
                         MainActivity.flag=1;
                     }
 
+                    break;
+                case 2:
+                    MainActivity.setnowTime();
                     break;
                 default:
                     break;
@@ -59,7 +61,14 @@ public class TitleLayout extends LinearLayout {
         titlepublish.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.setTime();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Message message = new Message();
+                        message.what=2;
+                        handler.sendMessage(message);
+                    }
+                }).start();
             }
         });
         titlemodel.setOnClickListener(new OnClickListener() {
