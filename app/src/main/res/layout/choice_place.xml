@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/mmm"
+        android:paddingTop="20dp"
         android:orientation="horizontal"
        >
 
@@ -19,13 +20,13 @@
             android:layout_weight="1"
             android:hint="选择或输入城市"/>
 
-        <Button
-            android:layout_toRightOf="@id/et"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/certain"
-            android:background="#00000000"
-            android:text="OK"/>
+        <!--<Button-->
+            <!--android:layout_toRightOf="@id/et"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/certain"-->
+            <!--android:background="#00000000"-->
+            <!--android:text="OK"/>-->
 
     </LinearLayout>
 

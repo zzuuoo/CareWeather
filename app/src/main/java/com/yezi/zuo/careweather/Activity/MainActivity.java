@@ -245,7 +245,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             textTemp.setText(
                     weather.getResults().get(0).getWeather_data().get(0).getTemperature()+
             "  风:"+weather.getResults().get(0).getWeather_data().get(0).getWind());
-            pm25.setText(" pm2.5值为:"+ weather.getResults().get(0).getPm25());
+            pm25.setText(" pm :"+ weather.getResults().get(0).getPm25());
             textTime.setText(weather.getDate());
             textWeather.setText(weather.getResults().get(0).getWeather_data().get(0).getWeather());
 
